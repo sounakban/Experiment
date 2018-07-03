@@ -9,13 +9,13 @@ from __future__ import division
 from __future__ import print_function
 
 
-# In[4]:
+# In[3]:
 
 
 import itertools
 import os
 
-get_ipython().run_line_magic('matplotlib', 'inline')
+# get_ipython().magic('matplotlib inline')
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -24,7 +24,7 @@ import tensorflow as tf
 from sklearn.preprocessing import LabelBinarizer, LabelEncoder
 from sklearn.metrics import confusion_matrix
 
-from tensorflow import keras
+import keras
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Dropout
 from keras.preprocessing import text, sequence
@@ -39,7 +39,8 @@ print("You have TensorFlow version", tf.__version__)
 
 # The CSV was generated from this query: https://bigquery.cloud.google.com/savedquery/513927984416:c494494324be4a80b1fc55f613abb39c
 # The data is also publicly available at this Cloud Storage URL: https://storage.googleapis.com/tensorflow-workshop-examples/stack-overflow-data.csv
-data = pd.read_csv("so-export-0920.csv")
+# data = pd.read_csv("so-export-0920.csv")
+data = pd.read_csv("stack-overflow-data.csv")
 
 
 # In[6]:
@@ -56,7 +57,7 @@ data.head()
 data['tags'].value_counts()
 
 
-# In[8]:
+# In[7]:
 
 
 # Split data into train and test
@@ -65,7 +66,7 @@ print ("Train size: %d" % train_size)
 print ("Test size: %d" % (len(data) - train_size))
 
 
-# In[9]:
+# In[8]:
 
 
 train_posts = data['post'][:train_size]
@@ -75,14 +76,14 @@ test_posts = data['post'][train_size:]
 test_tags = data['tags'][train_size:]
 
 
-# In[10]:
+# In[9]:
 
 
 max_words = 1000
 tokenize = text.Tokenizer(num_words=max_words, char_level=False)
 
 
-# In[11]:
+# In[10]:
 
 
 tokenize.fit_on_texts(train_posts) # only fit on train
@@ -90,7 +91,7 @@ x_train = tokenize.texts_to_matrix(train_posts)
 x_test = tokenize.texts_to_matrix(test_posts)
 
 
-# In[12]:
+# In[11]:
 
 
 # Use sklearn utility to convert label strings to numbered index
@@ -100,7 +101,7 @@ y_train = encoder.transform(train_tags)
 y_test = encoder.transform(test_tags)
 
 
-# In[13]:
+# In[12]:
 
 
 # Converts the labels to a one-hot representation
@@ -109,7 +110,7 @@ y_train = utils.to_categorical(y_train, num_classes)
 y_test = utils.to_categorical(y_test, num_classes)
 
 
-# In[14]:
+# In[13]:
 
 
 # Inspect the dimenstions of our training and test data (this is helpful to debug)
@@ -119,7 +120,7 @@ print('y_train shape:', y_train.shape)
 print('y_test shape:', y_test.shape)
 
 
-# In[15]:
+# In[14]:
 
 
 # This model trains very quickly and 2 epochs are already more than enough
@@ -129,7 +130,7 @@ batch_size = 32
 epochs = 2
 
 
-# In[16]:
+# In[15]:
 
 
 # Build the model
@@ -145,7 +146,7 @@ model.compile(loss='categorical_crossentropy',
               metrics=['accuracy'])
 
 
-# In[17]:
+# In[16]:
 
 
 # model.fit trains the model
@@ -159,7 +160,7 @@ history = model.fit(x_train, y_train,
                     validation_split=0.1)
 
 
-# In[18]:
+# In[17]:
 
 
 # Evaluate the accuracy of our trained model
@@ -169,21 +170,21 @@ print('Test score:', score[0])
 print('Test accuracy:', score[1])
 
 
-# In[19]:
+# In[18]:
 
 
 # Here's how to generate a prediction on individual examples
-text_labels = encoder.classes_ 
+text_labels = encoder.classes_
 
 for i in range(10):
     prediction = model.predict(np.array([x_test[i]]))
     predicted_label = text_labels[np.argmax(prediction)]
     print(test_posts.iloc[i][:50], "...")
     print('Actual label:' + test_tags.iloc[i])
-    print("Predicted label: " + predicted_label + "\n")  
+    print("Predicted label: " + predicted_label + "\n")
 
 
-# In[20]:
+# In[19]:
 
 
 y_softmax = model.predict(x_test)
@@ -206,40 +207,39 @@ for i in range(0, len(y_softmax)):
 # In[21]:
 
 
-# This utility function is from the sklearn docs: http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
-def plot_confusion_matrix(cm, classes,
-                          title='Confusion matrix',
-                          cmap=plt.cm.Blues):
-    """
-    This function prints and plots the confusion matrix.
-    Normalization can be applied by setting `normalize=True`.
-    """
-
-    cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title, fontsize=30)
-    plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45, fontsize=22)
-    plt.yticks(tick_marks, classes, fontsize=22)
-
-    fmt = '.2f'
-    thresh = cm.max() / 2.
-    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], fmt),
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
-
-    plt.ylabel('True label', fontsize=25)
-    plt.xlabel('Predicted label', fontsize=25)
-
-
-# In[22]:
-
-
-cnf_matrix = confusion_matrix(y_test_1d, y_pred_1d)
-plt.figure(figsize=(24,20))
-plot_confusion_matrix(cnf_matrix, classes=text_labels, title="Confusion matrix")
-plt.show()
-
+# # This utility function is from the sklearn docs: http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
+# def plot_confusion_matrix(cm, classes,
+#                           title='Confusion matrix',
+#                           cmap=plt.cm.Blues):
+#     """
+#     This function prints and plots the confusion matrix.
+#     Normalization can be applied by setting `normalize=True`.
+#     """
+#
+#     cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+#
+#     plt.imshow(cm, interpolation='nearest', cmap=cmap)
+#     plt.title(title, fontsize=30)
+#     plt.colorbar()
+#     tick_marks = np.arange(len(classes))
+#     plt.xticks(tick_marks, classes, rotation=45, fontsize=22)
+#     plt.yticks(tick_marks, classes, fontsize=22)
+#
+#     fmt = '.2f'
+#     thresh = cm.max() / 2.
+#     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+#         plt.text(j, i, format(cm[i, j], fmt),
+#                  horizontalalignment="center",
+#                  color="white" if cm[i, j] > thresh else "black")
+#
+#     plt.ylabel('True label', fontsize=25)
+#     plt.xlabel('Predicted label', fontsize=25)
+#
+#
+# # In[22]:
+#
+#
+# cnf_matrix = confusion_matrix(y_test_1d, y_pred_1d)
+# plt.figure(figsize=(24,20))
+# plot_confusion_matrix(cnf_matrix, classes=text_labels, title="Confusion matrix")
+# plt.show()
