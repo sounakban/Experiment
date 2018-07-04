@@ -24,9 +24,10 @@ import tensorflow as tf
 from sklearn.preprocessing import LabelBinarizer, LabelEncoder
 from sklearn.metrics import confusion_matrix
 
-import keras
-from keras.models import Sequential
-from keras.layers import Dense, Activation, Dropout
+from my_layer import ParaNet_layer1, ParaNet_layer2
+# import keras
+from keras.models import Model
+from keras.layers import Input, Dense, Activation, Dropout, Lambda
 from keras.preprocessing import text, sequence
 from keras import utils
 
@@ -127,23 +128,32 @@ print('y_test shape:', y_test.shape)
 # Training for more epochs will likely lead to overfitting on this dataset
 # You can try tweaking these hyperparamaters when using this model with your own data
 batch_size = 32
-epochs = 2
+epochs = 5
 
 
 # In[15]:
 
 
 # Build the model
-model = Sequential()
-model.add(Dense(512, input_shape=(max_words,)))
-model.add(Activation('relu'))
-model.add(Dropout(0.5))
-model.add(Dense(num_classes))
-model.add(Activation('softmax'))
+input = Input(shape=(max_words,))
+output = Dense(512)(input)
+output = Activation('relu')(output)
+# output = Dropout(0.5)(output)
+# num_of_splits = 128
+# total_nodes = 512
+# output = Lambda(ParaNet_layer1, arguments={'layer_splits':100, 'nodes_per_split':5})(output)
+# output = Lambda(ParaNet_layer2, arguments={'layer_splits':128})(output)
+# output = Dense(128)(input)
+# output = Activation('relu')(output)
+# output = Dropout(0.5)(output)
+output = Dense(num_classes)(output)
+output = Activation('softmax')(output)
 
+model = Model(inputs=input, outputs=output)
 model.compile(loss='categorical_crossentropy',
               optimizer='adam',
               metrics=['accuracy'])
+
 
 
 # In[16]:
