@@ -1,4 +1,3 @@
-
 # coding: utf-8
 
 # In[1]:
@@ -139,10 +138,12 @@ input = Input(shape=(max_words,))
 output = Dense(512)(input)
 output = Activation('relu')(output)
 # output = Dropout(0.5)(output)
+# # Paranet Layer
 # num_of_splits = 128
 # total_nodes = 512
-# output = Lambda(ParaNet_layer1, arguments={'layer_splits':100, 'nodes_per_split':5})(output)
+output = Lambda(ParaNet_layer1, arguments={'layer_splits':128, 'nodes_per_split':5})(output)
 # output = Lambda(ParaNet_layer2, arguments={'layer_splits':128})(output)
+# # Alternate Layer
 # output = Dense(128)(input)
 # output = Activation('relu')(output)
 # output = Dropout(0.5)(output)
